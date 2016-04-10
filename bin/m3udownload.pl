@@ -13,7 +13,10 @@ use POSIX 'strftime';
 
 GetOptions(
     'd|duration:s' => \my $duration,
+    'o|outfile:s'  => \my $outname,
 );
+
+$outname ||= 'm3udownload-%Y%m%d-%H%M%S.mp3'
 
 $duration ||= 60;
 if( $duration =~ m!(\d+):(\d+)! ) {
@@ -68,7 +71,7 @@ for my $url (@ARGV) {
         my( $data ) = @_;
         my $stream_source = $data->{data}->[0]->[0];
         
-        my $outfile = 'm3udownload.mp3';
+        my $outfile = strftime $outname, localtime;
         open my $fh, '>', $outfile
             or die "Couldn't save to '$outfile': $!";
         binmode $fh;
