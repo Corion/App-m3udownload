@@ -14,9 +14,10 @@ use POSIX 'strftime';
 GetOptions(
     'd|duration:s' => \my $duration,
     'o|outfile:s'  => \my $outname,
+    'quiet'        => \my $quiet,
 );
 
-$outname ||= 'm3udownload-%Y%m%d-%H%M%S.mp3'
+$outname ||= 'm3udownload-%Y%m%d-%H%M%S.mp3';
 
 $duration ||= 60;
 if( $duration =~ m!(\d+):(\d+)! ) {
@@ -60,7 +61,8 @@ sub parse_m3u {
 }
 
 my $stoptime = time + $duration;
-warn strftime "Recording until %H:%M:%S", localtime $stoptime;
+warn strftime "Recording until %H:%M:%S", localtime $stoptime
+    unless $quiet;
 for my $url (@ARGV) {
     request( 'GET' => $url)
     ->then(sub {
@@ -72,6 +74,9 @@ for my $url (@ARGV) {
         my $stream_source = $data->{data}->[0]->[0];
         
         my $outfile = strftime $outname, localtime;
+        warn "Writing to $outfile"
+            unless $quiet;
+
         open my $fh, '>', $outfile
             or die "Couldn't save to '$outfile': $!";
         binmode $fh;
@@ -81,7 +86,6 @@ for my $url (@ARGV) {
             on_body => sub {
                 my( $body, $headers ) = @_;
                 print {$fh} $body;
-                
                 
                 time < $stoptime
             }
