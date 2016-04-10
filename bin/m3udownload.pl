@@ -61,7 +61,7 @@ sub parse_m3u {
 }
 
 my $stoptime = time + $duration;
-warn strftime "Recording until %H:%M:%S", localtime $stoptime
+print strftime "Recording until %H:%M:%S\n", localtime $stoptime
     unless $quiet;
 for my $url (@ARGV) {
     request( 'GET' => $url)
@@ -74,7 +74,7 @@ for my $url (@ARGV) {
         my $stream_source = $data->{data}->[0]->[0];
         
         my $outfile = strftime $outname, localtime;
-        warn "Writing to $outfile"
+        print "Writing to $outfile\n"
             unless $quiet;
 
         open my $fh, '>', $outfile
