@@ -67,6 +67,7 @@ sub request {
     }
 }
 
+# This should go into MP3::M3U::Parser
 sub parse_ext_x_stream_inf {
     my($inf) = @_;
     $inf =~ m!^#EXT-X-STREAM-INF:(.*)$! or return;
@@ -74,6 +75,8 @@ sub parse_ext_x_stream_inf {
     \%info
 }
 
+# THis should go into some HTML meta parsing module, maybe
+# HTML::ExtractMeta  does that already (but doesn't handle the URL)
 sub parse_main_title {
     my( $html, $url ) = @_;
 
@@ -103,6 +106,7 @@ sub parse_html {
         # or just guess it from the stream?!
         if( $title !~ /\.mp[g34]/ ) {
             $title .= ".mp4"; # assume video?!
+            # We should fudge that later, and keep type+outname separate
         };
         $outname ||= $title;
         print "Found $content ($title)\n"
