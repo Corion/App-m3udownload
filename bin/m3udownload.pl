@@ -102,7 +102,7 @@ sub parse_html {
             $title .= ".mp4";
         };
         $outname ||= $title;
-        print "Found $content ($title)"
+        print "Found $content ($title)\n"
             unless $quiet;
         return fetch_m3u( $content )
     } else {
