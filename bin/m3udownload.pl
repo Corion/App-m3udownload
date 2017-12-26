@@ -98,8 +98,11 @@ sub parse_html {
     if( $html =~ m!"(https?://[^"]+\.m3u8?\b[^"]*)"!si) {
         my $content = URI->new_abs( $1, $base );
         my $title = parse_main_title( $html, $base );
-        if( $title !~ /\.mp4/ ) {
-            $title .= ".mp4";
+
+        # We should have a switch for the type instead
+        # or just guess it from the stream?!
+        if( $title !~ /\.mp[g34]/ ) {
+            $title .= ".mp4"; # assume video?!
         };
         $outname ||= $title;
         print "Found $content ($title)\n"
