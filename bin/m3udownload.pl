@@ -171,9 +171,10 @@ sub fetch_m3u {
     })
 }
 
+my $starttime = time;
 my $stoptime;
 if( $duration ) {
-    $stoptime = time + $duration;
+    $stoptime = $starttime + $duration;
     print strftime "Recording until %H:%M:%S\n", localtime $stoptime
         unless $quiet;
 };
@@ -196,18 +197,25 @@ sub save_url {
             print {$fh} $body;
 
             $written += length $body;
-            if( $headers->{"content-length"} and $written >= $headers->{"content-length"}) {
-                close $fh;
-                $completed++;
-                print sprintf "[%d/%d] %s\r", $completed, $total, $outname;
-            };
 
             if( $stoptime ) {
-                close $fh;
-                return time < $stoptime
+                if( time > $stoptime ) {
+                    close $fh;
+                    return 0
+                } else {
+                    my $running = int((time - $starttime)/60);
+                    print sprintf "[%d/%d] %s\r", $running, ($duration/60), $outname
+                        unless $quiet;
+                };
             } else {
-                return 1
-            }
+                if( $headers->{"content-length"} and $written >= $headers->{"content-length"}) {
+                    close $fh;
+                    $completed++;
+                    print sprintf "[%d/%d] %s\r", $completed, $total, $outname
+                        unless $quiet;
+                };
+            };
+            return 1
         }
     );
 }
