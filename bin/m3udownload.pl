@@ -19,11 +19,10 @@ GetOptions(
 
 $outname ||= 'm3udownload-%Y%m%d-%H%M%S.mp3';
 
-$duration ||= 60;
 if( $duration =~ m!(\d+):(\d+)! ) {
     # hh:mm
     $duration = ($1 * 3600) + $2 * 60;
-} else {
+} elsif( $duration ) {
     # minutes
     $duration = $duration * 60;
 }
