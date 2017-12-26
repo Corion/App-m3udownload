@@ -264,7 +264,13 @@ for my $url (@ARGV) {
                 $target = strftime $outname, localtime;
             };
 
-            $target = File::Spec->catfile( $tempdir, $target );
+            if( $total > 1 ) {
+                # Only multipart files need to go to a tempdir
+                $target = File::Spec->catfile( $tempdir, $target );
+            } else {
+                # We can store it directly
+                $target = File::Spec->catfile( $outdir, $outname );
+            }
             verbose "Retrieving $stream_source to $target";
             push @files, $target;
             push @downloads, save_url( $stream_source, $target )
@@ -276,7 +282,9 @@ for my $url (@ARGV) {
         # Now, how do we decide whether to combine all items from the playlist or not?!
         # For the time being, we know that .ts files want to be combined using ffmpeg:
         my $res = $download_finished;
-        if( $files[0] =~ /\.ts$/ ) {
+
+        # Combine the files
+        if( $total > 1 ) {
             my $final_file = File::Spec->catfile( $outdir, $outname );
             $res = $download_finished->then( concat_files( \@files, $final_file ));
         }
