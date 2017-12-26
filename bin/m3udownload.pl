@@ -246,7 +246,21 @@ sub concat_files {
     }
 }
 
+sub local_name {
+    my( $filename ) = @_;
+
+    my $res;
+    if( $outname ) {
+        $res = strftime $outname, localtime;
+    } else {
+        $res = clean_fragment(basename $filename);
+    }
+    $res = File::Spec->catfile( $outdir, $res );
+    return $res
+}
+
 for my $url (@ARGV) {
+
     fetch_m3u( $url )
     ->then(sub {
         my( $data, $url ) = @_;
@@ -263,16 +277,12 @@ for my $url (@ARGV) {
             my $stream_source = URI->new_abs( $target, $url );
             $target =~ s!\?.*!!;
 
-            if( $target !~ /\.ts/ and $outname ) {
-                $target = strftime $outname, localtime;
-            };
-
             if( $total > 1 ) {
                 # Only multipart files need to go to a tempdir
                 $target = File::Spec->catfile( $tempdir, $target );
             } else {
                 # We can store it directly
-                $target = File::Spec->catfile( $outdir, $outname );
+                $target = local_name( $target );
             }
             verbose "Retrieving $stream_source to $target";
             push @files, $target;
@@ -288,8 +298,7 @@ for my $url (@ARGV) {
 
         # Combine the files
         if( $total > 1 ) {
-            my $final_file = File::Spec->catfile( $outdir, $outname );
-            $res = $download_finished->then( concat_files( \@files, $final_file ));
+            $res = $download_finished->then( concat_files( \@files, local_name() ));
         }
         $res
 
