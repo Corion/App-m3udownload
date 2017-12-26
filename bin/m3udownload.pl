@@ -17,6 +17,13 @@ use File::Temp 'tempdir';
 use File::Path 'remove_tree';
 use Text::CleanFragment;
 
+=head1 USAGE
+
+  # Find and download (first) stream from HTTP page, record 60 minutes
+  m3udownload.pl -f http://www.you-fm.de/music/you-fm-online-hoeren,webradio-102.html -d 60
+
+=cut
+
 GetOptions(
     'd|duration:s' => \my $duration,
     'o|outfile:s'  => \my $outname,
