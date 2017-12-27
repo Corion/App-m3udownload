@@ -241,7 +241,6 @@ sub concat_files {
         close $list;
 
         # Now, join the files
-        $ENV{PATH} = "c:\\Users\\corion\\Projekte\\App-ShaderToy\\;" . $ENV{PATH};
         system("ffmpeg -safe 0 -f concat -i join.txt -vcodec copy -acodec copy -bsf:a aac_adtstoasc \"$target\"")== 0
             or die "$! / $?";
         unlink @unlink;
