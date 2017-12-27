@@ -270,6 +270,7 @@ for my $url (@ARGV) {
 
         # Iterate over all entries (hoping that they are consecutive)
         # Fetch them all simultaneously
+        # We should put a limit of (say) 4 requests in flight here ...
         my @downloads;
         my @files;
         $total = @{ $data->[0]->{data} };
