@@ -128,6 +128,9 @@ sub parse_m3u {
 
     my $parser = MP3::M3U::Parser->new;
 
+    # Fudge the m3u as M3U::Parser doesn't seen to handle empty lines well?!
+    $m3u =~ s!(\r?\n)+(\r?\n)!$2!g;
+
     verbose "Parsing $m3u";
 
     my $validm3u = eval {
