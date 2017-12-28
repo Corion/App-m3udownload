@@ -23,6 +23,24 @@ use Text::CleanFragment;
   # Find and download (first) stream from HTTP page, record 60 minutes
   m3udownload.pl -f http://www.you-fm.de/music/you-fm-online-hoeren,webradio-102.html -d 60
 
+  # Download video stream
+  m3udownload.pl http://www.streambox.fr/playlists/test_001/stream.m3u8 -o arte.mp4
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<--duration>
+
+Duration of recording. This is the duration in wall clock time, not the length
+of the stream.
+
+=head1 DESCRIPTION
+
+C<m3udownload.pl> downloads HLS streams usually encoded as M3U playlists and
+saves them as a single file. It can also extract M3U links from an HTML page
+for convenient quick launch from external tools.
+
 =cut
 
 GetOptions(
