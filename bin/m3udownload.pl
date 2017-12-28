@@ -149,13 +149,22 @@ sub parse_m3u {
     # further resolving, later on:
     my $res = $parser->result;
 
-    if( $res->[0]->{data}->[0]->[0] =~ m!^#EXT-X-STREAM-INF:! ) {
+    # Filter/reparse the results :-/
+    # https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8
+
+    my @items = @{ $res->[0]->{data} };
+    shift @items
+        while( @items
+               and $items[0]->[0] =~ /^#/ and
+               $items[0]->[0] !~ m!#EXT-X-STREAM-INF:! );
+
+    if( $items[0]->[0] =~ m!^#EXT-X-STREAM-INF:! ) {
         verbose "Found multiple playlists";
         my @streams;
-        $res = $res->[0]->{data};
-        for my $i (0.. (@$res/2) -1) {
-            push @streams, parse_ext_x_stream_inf( $res->[$i*2]->[0] );
-            $streams[-1]->{url} = $res->[$i*2+1]->[0];
+        #$res = $res->[0]->{data};
+        for my $i (0.. (@items/2) -1) {
+            push @streams, parse_ext_x_stream_inf( $items[$i*2]->[0] );
+            $streams[-1]->{url} = $items[$i*2+1]->[0];
         };
 
         # now, find the stream with the highest bandwidth
