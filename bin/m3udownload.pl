@@ -327,7 +327,8 @@ for my $url (@ARGV) {
 
             if( $total > 1 ) {
                 # Only multipart files need to go to a tempdir
-                $target = File::Spec->catfile( $tempdir, $target );
+                # We should use tempfile() here, to avoid clashes?!
+                $target = File::Spec->catfile( $tempdir, basename($target) );
             } else {
                 # We can store it directly
                 $target = local_name( $target );
@@ -351,6 +352,9 @@ for my $url (@ARGV) {
         }
         $res
 
+    })
+    ->catch(sub {
+        die "@_"
     })->await;
 }
 
