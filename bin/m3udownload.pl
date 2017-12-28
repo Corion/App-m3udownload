@@ -25,12 +25,13 @@ use Text::CleanFragment;
 =cut
 
 GetOptions(
-    'd|duration:s' => \my $duration,
-    'o|outfile:s'  => \my $outname,
+    'd|duration:s'       => \my $duration,
+    'o|outfile:s'        => \my $outname,
     'output-directory:s' => \my $outdir,
-    'f|force'      => \my $parse_html,
-    'quiet'        => \my $quiet,
-    'debug'        => \my $debug,
+    't|output-type:s'    => \my $outtype,
+    'f|force'            => \my $parse_html,
+    'quiet'              => \my $quiet,
+    'debug'              => \my $debug,
 );
 
 $|++;
@@ -42,7 +43,7 @@ sub verbose($) {
 }
 
 if( ! $parse_html ) {
-    $outname ||= 'm3udownload-%Y%m%d-%H%M%S.mp3';
+    $outname ||= 'm3udownload-%Y%m%d-%H%M%S';
 };
 
 if( $duration =~ m!(\d+):(\d+)! ) {
@@ -105,7 +106,7 @@ sub parse_html {
         # We should have a switch for the type instead
         # or just guess it from the stream?!
         if( $title !~ /\.mp[g34]/ ) {
-            $title .= ".mp4"; # assume video?!
+            #$title .= ".mp4"; # assume video?!
             # We should fudge that later, and keep type+outname separate
         };
         $outname ||= $title;
@@ -258,6 +259,25 @@ sub local_name {
     } else {
         $res = clean_fragment(basename $filename);
     }
+
+    if( $outname ) {
+        # The user specified the output filename extension, nothing to guess
+
+    } elsif( $outtype ) {
+        # Do something like stripping an extension if there is any:
+        $res =~ s!(\.\w+)$!!;
+        $res .= ".$outtype";
+
+    } elsif( $filename =~ /(\.\w+)$/ ) {
+        # (re)use the extension of the filename
+        $res .= $1
+
+    } else {
+        # We don't know what to do with the extension, so we'll assume the
+        # maximum possible and try to output/convert to .mp4
+        $res .= '.mp4'
+    }
+
     $res = File::Spec->catfile( $outdir, $res );
     return $res
 }
