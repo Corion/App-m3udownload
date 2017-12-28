@@ -194,7 +194,7 @@ my $total;
 my $completed;
 
 sub save_url {
-    my( $url, $filename ) = @_;
+    my( $url, $filename, $target_visual ) = @_;
 
     open my $fh, '>', $filename
         or die "Couldn't save to '$filename': $!";
@@ -215,14 +215,14 @@ sub save_url {
                     return 0
                 } else {
                     my $running = int((time - $starttime)/60);
-                    print sprintf "[%d/%d] %s\r", $running, ($duration/60), $outname || $stream_title
+                    print sprintf "[%d/%d] %s\r", $running, ($duration/60), $target_visual
                         unless $quiet;
                 };
             } else {
                 if( $headers->{"content-length"} and $written >= $headers->{"content-length"}) {
                     close $fh;
                     $completed++;
-                    print sprintf "[%d/%d] %s\r", $completed, $total, $outname || $stream_title
+                    print sprintf "[%d/%d] %s\r", $completed, $total, $target_visual
                         unless $quiet;
                 };
             };
@@ -317,7 +317,8 @@ for my $url (@ARGV) {
             }
             verbose "Retrieving $stream_source to $target";
             push @files, $target;
-            push @downloads, save_url( $stream_source, $target )
+            my $v = $stream_title || $target;
+            push @downloads, save_url( $stream_source, $target, $v )
         };
 
         verbose "Waiting for downloads";
