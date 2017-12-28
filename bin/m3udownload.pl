@@ -15,6 +15,7 @@ use JSON 'decode_json';
 use File::Spec;
 use File::Temp 'tempdir';
 use File::Path 'remove_tree';
+use File::Basename;
 use Text::CleanFragment;
 
 =head1 USAGE
@@ -321,7 +322,7 @@ for my $url (@ARGV) {
             }
             verbose "Retrieving $stream_source to $target";
             push @files, $target;
-            my $v = $stream_title || $target;
+            my $v = $stream_title || basename($target);
             push @downloads, save_url( $stream_source, $target, $v )
         };
 

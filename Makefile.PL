@@ -48,6 +48,8 @@ WriteMakefile1(
         'URI'                 => 0,
         'POSIX'               => 0,
         'File::Spec'          => 0,
+        'File::Temp'          => 0,
+        'File::Basename'      => 0,
         'Text::CleanFragment' => 0,
    },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
