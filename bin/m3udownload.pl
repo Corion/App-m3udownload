@@ -225,10 +225,15 @@ if( $duration ) {
 my $total;
 my $completed;
 
+my $last_progress = '';
 sub download_progress {
     my( $current, $total, $visual ) = @_;
-    print sprintf "[%d/%d] %s\r", $current, $total, $visual
-        unless $quiet;
+    unless( $quiet ) {
+        my $progress = sprintf "[%d/%d] %s\r", $current, $total, $visual;
+        print $progress
+            if $last_progress ne $progress;
+        $last_progress = $progress;
+    }
 }
 
 sub save_url {
