@@ -38,6 +38,8 @@ $|++;
 $outdir ||= '.';
 my $tempdir = tempdir();
 
+our $stream_title; # will store the (page) title
+
 sub verbose($) {
     print "$_[0]\n" if $debug;
 }
@@ -109,8 +111,9 @@ sub parse_html {
             #$title .= ".mp4"; # assume video?!
             # We should fudge that later, and keep type+outname separate
         };
-        $outname ||= $title;
-        print "Found $content ($title)\n"
+        $stream_title = $title;
+
+        print "Found $content ($stream_title)\n"
             unless $quiet;
         return fetch_m3u( $content )
     } else {
@@ -212,14 +215,14 @@ sub save_url {
                     return 0
                 } else {
                     my $running = int((time - $starttime)/60);
-                    print sprintf "[%d/%d] %s\r", $running, ($duration/60), $outname
+                    print sprintf "[%d/%d] %s\r", $running, ($duration/60), $outname || $stream_title
                         unless $quiet;
                 };
             } else {
                 if( $headers->{"content-length"} and $written >= $headers->{"content-length"}) {
                     close $fh;
                     $completed++;
-                    print sprintf "[%d/%d] %s\r", $completed, $total, $outname
+                    print sprintf "[%d/%d] %s\r", $completed, $total, $outname || $stream_title
                         unless $quiet;
                 };
             };
@@ -256,6 +259,10 @@ sub local_name {
     my $res;
     if( $outname ) {
         $res = strftime $outname, localtime;
+
+    } elsif( $stream_title ) {
+        $res = clean_fragment($stream_title);
+
     } else {
         $res = clean_fragment(basename $filename);
     }
