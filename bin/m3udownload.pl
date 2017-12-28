@@ -75,11 +75,12 @@ sub request {
 sub parse_ext_x_stream_inf {
     my($inf) = @_;
     $inf =~ m!^#EXT-X-STREAM-INF:(.*)$! or return;
-    my %info = split /[=,]/, $1;
+    my $i = $1;
+    my %info = $i =~ /([^,]+)=("(?:[^"]+)"|(?:[^,="]+))/g;
     \%info
 }
 
-# THis should go into some HTML meta parsing module, maybe
+# This should go into some HTML meta parsing module, maybe
 # HTML::ExtractMeta  does that already (but doesn't handle the URL)
 sub parse_main_title {
     my( $html, $url ) = @_;
