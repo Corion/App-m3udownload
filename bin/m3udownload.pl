@@ -41,6 +41,13 @@ C<m3udownload.pl> downloads HLS streams usually encoded as M3U playlists and
 saves them as a single file. It can also extract M3U links from an HTML page
 for convenient quick launch from external tools.
 
+=head1 LIMITATIONS
+
+Currently, this client does not yet support re-fetching the playlist to find
+new segments added to the playlist according to
+[https://tools.ietf.org/html/draft-pantos-http-live-streaming-23#section-6.2.1]
+.
+
 =cut
 
 GetOptions(
