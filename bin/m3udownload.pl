@@ -248,6 +248,12 @@ sub save_url {
         'GET' => $url,
         on_body => sub {
             my( $body, $headers ) = @_;
+
+            if( $headers->{Status} =~ /^[45]/ ) {
+                my $msg = join ":", $headers->{URL}, $headers->{Reason};
+                warn "$msg\n";
+                return 0;
+            };
             print {$fh} $body;
 
             $written += length $body;
