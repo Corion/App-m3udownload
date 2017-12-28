@@ -336,7 +336,7 @@ for my $url (@ARGV) {
             }
             verbose "Retrieving $stream_source to $target";
             push @files, $target;
-            my $v = $stream_title || basename($target);
+            my $v = $stream_title || basename($url);
             push @downloads, save_url( $stream_source, $target, $v )
         };
 
