@@ -193,6 +193,12 @@ if( $duration ) {
 my $total;
 my $completed;
 
+sub download_progress {
+    my( $current, $total, $visual ) = @_;
+    print sprintf "[%d/%d] %s\r", $current, $total, $visual
+        unless $quiet;
+}
+
 sub save_url {
     my( $url, $filename, $target_visual ) = @_;
 
@@ -215,15 +221,13 @@ sub save_url {
                     return 0
                 } else {
                     my $running = int((time - $starttime)/60);
-                    print sprintf "[%d/%d] %s\r", $running, ($duration/60), $target_visual
-                        unless $quiet;
+                    download_progress( $running, ($duration/60), $target_visual );
                 };
             } else {
                 if( $headers->{"content-length"} and $written >= $headers->{"content-length"}) {
                     close $fh;
                     $completed++;
-                    print sprintf "[%d/%d] %s\r", $completed, $total, $target_visual
-                        unless $quiet;
+                    download_progress( $completed, $total, $target_visual );
                 };
             };
             return 1
