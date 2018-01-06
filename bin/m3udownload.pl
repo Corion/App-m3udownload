@@ -4,9 +4,13 @@ use Future;
 use Data::Dumper;
 use Getopt::Long;
 
+use FindBin '$Bin';
+use lib "$Bin/../../Promises-RateLimiter/lib";
+
 # Use AnyEvent, AnyEvent::HTTP for the moment as downloader
 use AnyEvent::HTTP;
 use AnyEvent::Future 'as_future_cb';
+use Future::Limiter;
 
 use URI;
 use MP3::M3U::Parser;
@@ -44,7 +48,7 @@ for convenient quick launch from external tools.
 
 Currently, this client does not yet support re-fetching the playlist to find
 new segments added to the playlist according to
-[https://tools.ietf.org/html/draft-pantos-http-live-streaming-23#section-6.2.1]
+L<https://tools.ietf.org/html/draft-pantos-http-live-streaming-23#section-6.2.1>
 .
 
 =cut
@@ -63,6 +67,9 @@ $|++;
 $outdir ||= '.';
 my $tempdir = tempdir( CLEANUP => 1 );
 
+my $limiter = Future::Limiter->new(
+    maximum => 4,
+);
 
 our $stream_title; # will store the (page) title
 
@@ -85,15 +92,21 @@ if( $duration =~ m!(\d+):(\d+)! ) {
 sub request {
     my( @args ) = @_;
 
-    as_future_cb {
-        my ( $done, $fail ) = @_;
-        http_request(
+    my( $url ) = URI->new( $args[1] );
+    my $host = $url->host;
+    $limiter->limit($host)
+    ->then(sub {
+        my( $token ) = @_;
+        my $res = AnyEvent::Future->new();
+
+        my $handle;
+        $handle = http_request(
             GET => $args[1],
             @args,
-            $done
-            #cb => $done,
-        )
-    }
+            sub { undef $token; undef $handle; $res->done( @_ ) }
+        );
+        $res
+    })
 }
 
 # This should go into MP3::M3U::Parser
@@ -208,7 +221,7 @@ sub parse_m3u {
 
 sub fetch_m3u {
     my( $url ) = @_;
-    request( 'GET' => $url)
+    request( 'GET' => $url )
     ->then(sub {
         my( $body, $headers ) = @_;
         warn Dumper $headers
@@ -350,8 +363,6 @@ for my $url (@ARGV) {
         my( $data, $url ) = @_;
 
         # Iterate over all entries (hoping that they are consecutive)
-        # Fetch them all simultaneously
-        # We should put a limit of (say) 4 requests in flight here ...
         my @downloads;
         my @files;
         $total = @{ $data->[0]->{data} };
