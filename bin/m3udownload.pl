@@ -14,7 +14,6 @@ use POSIX 'strftime';
 use JSON 'decode_json';
 use File::Spec;
 use File::Temp 'tempdir';
-use File::Path 'remove_tree';
 use File::Basename;
 use Text::CleanFragment;
 
@@ -62,7 +61,8 @@ GetOptions(
 
 $|++;
 $outdir ||= '.';
-my $tempdir = tempdir();
+my $tempdir = tempdir( CLEANUP => 1 );
+
 
 our $stream_title; # will store the (page) title
 
@@ -394,10 +394,3 @@ for my $url (@ARGV) {
         die "@_"
     })->await;
 }
-
-remove_tree(
-    $tempdir,
-    {
-        safe => 1,
-    }
-);
