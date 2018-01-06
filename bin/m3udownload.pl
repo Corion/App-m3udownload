@@ -299,7 +299,7 @@ sub concat_files {
         close $list;
 
         # Now, join the files
-        system("ffmpeg -safe 0 -f concat -i join.txt -vcodec copy -acodec copy -bsf:a aac_adtstoasc \"$target\"")== 0
+        system("ffmpeg -y -safe 0 -f concat -i join.txt -vcodec copy -acodec copy -bsf:a aac_adtstoasc \"$target\"") == 0
             or die "$! / $?";
         unlink @unlink;
 
