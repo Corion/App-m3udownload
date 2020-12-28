@@ -81,7 +81,7 @@ if( ! $parse_html ) {
     $outname ||= 'm3udownload-%Y%m%d-%H%M%S';
 };
 
-if( $duration =~ m!(\d+):(\d+)! ) {
+if( $duration and $duration =~ m!(\d+):(\d+)! ) {
     # hh:mm
     $duration = ($1 * 3600) + $2 * 60;
 } elsif( $duration ) {
@@ -342,7 +342,7 @@ sub local_name {
         $res =~ s!(\.\w+)$!!;
         $res .= ".$outtype";
 
-    } elsif( $filename =~ /(\.\w+)$/ ) {
+    } elsif( defined $filename and $filename =~ /(\.\w+)$/ ) {
         # (re)use the extension of the filename
         $res .= $1
 
